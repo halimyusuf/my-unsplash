@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import { cloneElement, useState } from "react";
 import styles from "../styles/navbar.module.css";
 import Head from "next/head";
 import NavModal from "./NavModal";
@@ -7,6 +7,7 @@ import NavModal from "./NavModal";
 export default function Navbar() {
   const [modal, setModal] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   function onAddPhoto() {
     setModal(!modal);
@@ -17,6 +18,11 @@ export default function Navbar() {
   }
 
   function onToggle() {}
+
+  function onFormSubmit(e) {
+    e.preventDefault();
+    console.log(searchValue);
+  }
 
   return (
     <>
@@ -40,11 +46,15 @@ export default function Navbar() {
               />
             </div>
             <div>
-              <input
-                className={styles.nav_input}
-                type="text"
-                placeholder="Search by name"
-              />
+              <form onSubmit={(e) => onFormSubmit(e)}>
+                <input
+                  className={styles.nav_input}
+                  value={searchValue}
+                  type="text"
+                  placeholder="Search by name"
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </form>
             </div>
           </div>
           <div>
@@ -54,13 +64,17 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
-      <div className="d-flex justify-content-end mr-3">
+      <div className={`d-flex justify-content-end mr-3 ${styles.hide_for_md}`}>
         <div className="my-2 mx-3">
-          <input
-            className={styles.nav_input}
-            type="text"
-            placeholder="Search by name"
-          />
+          <form onSubmit={(e) => onFormSubmit(e)}>
+            <input
+              value={searchValue}
+              className={styles.nav_input}
+              onChange={(e) => setSearchValue(e.target.value)}
+              type="text"
+              placeholder="Search by name"
+            />
+          </form>
         </div>
       </div>
       <>
