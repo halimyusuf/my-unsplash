@@ -1,10 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import cloudinary from "cloudinary";
 import nc from "next-connect";
-import intializeDB from "../../config/mongoose";
-import ENVS from "../../config/process.env";
-import logger from "../../utils/logger";
-import Image from "../../model/Image";
+import intializeDB from "../../../config/mongoose";
+import ENVS from "../../../config/process.env";
+import logger from "../../../utils/logger";
+import Image from "../../../model/Image";
 
 const app = nc();
 
