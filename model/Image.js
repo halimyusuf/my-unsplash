@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const imageSchema = new Schema(
   {
@@ -7,5 +7,5 @@ const imageSchema = new Schema(
   },
   { timestamps: true }
 );
-
-export default model("Image", imageSchema);
+const Model = models.Image || model("Image", imageSchema);
+export default Model;
