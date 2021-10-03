@@ -1,30 +1,20 @@
 import styles from "../styles/navbar.module.css";
 import axios from "axios";
 import { useState } from "react";
+import Loader from "./Loader";
+import { useStore } from "../store";
+import { useAsync, validURL } from "../utils";
 
 export default function NavModal({ setModal, modal }) {
+  const [cache, dispatch] = useStore();
   const [form, setForm] = useState({
     label: "",
     url: "",
     labelError: "",
     urlError: "",
-    loading: false,
   });
-
-  const { label, url, labelError, urlError, loading } = form;
-
-  function validURL(str) {
-    var pattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
-    ); // fragment locator
-    return !!pattern.test(str);
-  }
+  const { run, status } = useAsync();
+  const { label, url, labelError, urlError } = form;
 
   function handleSubmit() {
     if (form.label.length < 1 && !validURL(form.url)) {
@@ -41,28 +31,33 @@ export default function NavModal({ setModal, modal }) {
       setForm({ ...form, urlError: "Invalid Url", labelError: "" });
       return;
     } else {
-      setForm({ ...form, urlError: "", labelError: "", loading: true });
+      setForm({ ...form, urlError: "", labelError: "" });
     }
-    axios
-      .post("/api/image", {
-        label: form.label,
-        imageUrl: form.url,
-      })
-      .then((result) => {
-        setForm({ ...form, loading: false, label: "", url: "" });
-        console.log(result);
-      })
-      .then(() => setModal(false))
-      .catch((err) => {
-        console.log(err);
-        setForm({ ...form, loading: false });
-      });
+    run(
+      axios
+        .post("/api/image", {
+          label: form.label,
+          imageUrl: form.url,
+        })
+        .then((result) => {
+          dispatch({ type: "ADD_IMAGE", data: result.data.data });
+          setForm({ ...form, label: "", url: "" });
+          console.log(result.data.data);
+        })
+        .then(() => setModal(false))
+        .catch((err) => {
+          console.log(err);
+          setForm({ ...form });
+        })
+    );
   }
 
   function onFormChange(e, field) {
     const value = e.target.value;
     setForm({ ...form, [field]: value });
   }
+
+  const loading = status === "pending";
 
   return (
     <div
@@ -78,29 +73,29 @@ export default function NavModal({ setModal, modal }) {
           <div className={styles.input_group}>
             <label htmlFor="photo-label">Label</label>
             <input
-              value={form.label}
+              value={label}
               onChange={(e) => onFormChange(e, "label")}
-              className={form.urlError.length === 0 ? "" : styles.error}
+              className={urlError.length === 0 ? "" : styles.error}
               placeholder="Suspendisse elit massa"
             />
-            {form.labelError.length === 0 ? (
+            {labelError.length === 0 ? (
               ""
             ) : (
-              <small className={styles.text_error}>{form.labelError}</small>
+              <small className={styles.text_error}>{labelError}</small>
             )}
           </div>
           <div className={styles.input_group}>
             <label htmlFor="photo-label">Photo URL</label>
             <input
-              value={form.url}
-              className={form.labelError.length === 0 ? "" : styles.error}
+              value={url}
+              className={labelError.length === 0 ? "" : styles.error}
               onChange={(e) => onFormChange(e, "url")}
               placeholder="https://images.unsplash.com/photo-1584395630827-860eee694d7b?ixlib=r..."
             />
-            {form.urlError.length === 0 ? (
+            {urlError.length === 0 ? (
               ""
             ) : (
-              <small className={styles.text_error}>{form.urlError}</small>
+              <small className={styles.text_error}>{urlError}</small>
             )}
           </div>
         </div>
@@ -112,19 +107,11 @@ export default function NavModal({ setModal, modal }) {
             Cancel
           </div>
           <div onClick={handleSubmit} className={styles.modal_action_btn}>
-            <div>{form.loading ? "Loading.." : "Submit"}</div>
+            <div>{loading ? "Loading.." : "Submit"}</div>
           </div>
         </div>
 
-        {loading ? (
-          <div className="loader-modal">
-            <div className="loader-modal-content-cont">
-              <div className="loader-modal-content"></div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+        <Loader condition={loading} />
       </div>
     </div>
   );
