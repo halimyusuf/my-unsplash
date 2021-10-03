@@ -85,10 +85,12 @@ a {
   line-height: 22px;
   letter-spacing: 0em;
   text-align: left;
-  text-overflow: ellipsis;
   color: white;
   max-height: 100%;
-  margin-top: 40%;
+  margin-top: 50%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .loader-modal {
