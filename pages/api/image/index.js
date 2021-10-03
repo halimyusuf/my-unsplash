@@ -31,10 +31,10 @@ app.post(async (req, res) => {
     let newImg = new Image({ url, label });
     try {
       newImg = await newImg.save();
-      res.status(200).json({ data: newImg });
+      return res.status(200).json({ data: newImg });
     } catch (error) {
       logger(error);
-      res.status(500).json({ error: "Server error" });
+      return res.status(500).json({ error: "Server error" });
     }
   } catch (error) {
     console.log(error);
