@@ -1,13 +1,19 @@
 import Image from "next/image";
+import axios from "axios";
 import { cloneElement, useState } from "react";
 import styles from "../styles/navbar.module.css";
 import Head from "next/head";
 import NavModal from "./NavModal";
+import { useAsync } from "../utils";
+import { useStore } from "../store";
+import Loader from "./Loader";
 
 export default function Navbar() {
   const [modal, setModal] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const { data, error, status, run, setError } = useAsync();
+  const [cache, dispatch] = useStore();
 
   function onAddPhoto() {
     setModal(!modal);
@@ -22,6 +28,19 @@ export default function Navbar() {
   function onFormSubmit(e) {
     e.preventDefault();
     console.log(searchValue);
+    // http://localhost:3000/api/image/search?q=room
+    run(
+      axios
+        .get(`/api/image/search?q=${searchValue}`)
+        .then((result) => {
+          console.log(result);
+          dispatch({ type: "SEARCH_FILTER", data: result.data.data });
+        })
+        .catch((err) => {
+          console.log(err);
+          setError(err);
+        })
+    );
   }
 
   return (
@@ -80,6 +99,7 @@ export default function Navbar() {
       <>
         <NavModal setModal={setModal} modal={modal} />
       </>
+      <Loader condition={status === "pending"} />
     </>
   );
 }
