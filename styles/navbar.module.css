@@ -1,5 +1,5 @@
 .nav {
-  margin: 10px 5vw;
+  margin: 15px 5vw;
 }
 
 .nav_inner {
@@ -37,7 +37,7 @@
 .nav_btn,
 .modal_action_btn {
   width: 137px;
-  height: 55px;
+  height: 47px;
   background: #3db46d;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -166,7 +166,7 @@
 
 .modal_action_btn {
   width: 105px;
-  height: 55px;
+  height: 47px;
 }
 
 .hide_for_md {
